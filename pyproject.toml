@@ -25,3 +25,7 @@ extend-immutable-calls = [
   # "fastapi.Form","fastapi.params.Form",
   # "fastapi.Security","fastapi.params.Security",
 ]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "4.10.0"

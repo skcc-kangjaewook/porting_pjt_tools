@@ -26,6 +26,13 @@ repos:
       # 병합 충돌 마커 감지
       - id: check-merge-conflict
 
+  # Commitizen - 커밋 메시지 표준화 도구
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.10.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
 # 전역 설정
 exclude: |
   (?x)^(
