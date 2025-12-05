@@ -1,20 +1,18 @@
 import base64
+import os
 
-# import os
 import requests
-
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 from nacl import encoding, public
 
-# load_dotenv()
+load_dotenv()
 
 # `.env` 또는 환경변수에서 토큰을 읽습니다.
-# github_token = os.getenv("GITHUB_TOKEN")
-# if not github_token:
-#     raise RuntimeError("환경변수 GITHUB_TOKEN이 설정되어 있지 않습니다. .env 파일 또는 환경변수에 토큰을 추가하세요.")
+github_token = os.getenv("GITHUB_TOKEN")
+if not github_token:
+    raise RuntimeError("환경변수 GITHUB_TOKEN이 설정되어 있지 않습니다. .env 파일 또는 환경변수에 토큰을 추가하세요.")
 
 organization = "skccmygit"
-github_token = "ghp_yourtokenhere"
 
 base_url = "https://api.github.com"
 
