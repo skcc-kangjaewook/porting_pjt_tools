@@ -1,0 +1,43 @@
+# Pre-commit 설정 파일
+# pre-commit 프레임워크를 사용하여 커밋 전 자동으로 코드 검사 및 포맷팅 수행
+
+repos:
+  # Ruff - 린팅과 포맷팅
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.8  
+    hooks:
+      # Ruff 린팅 (검사만 수행)
+      - id: ruff
+        args: ["--fix"]  # 자동 수정 가능한 문제는 자동 수정
+        exclude: ^(\.venv/|build/|dist/)
+
+      # Ruff 포맷팅 (코드 스타일 정렬)
+      - id: ruff-format
+        exclude: ^(\.venv/|build/|dist/)
+
+  # Pre-commit 기본 훅 (Ruff로 커버되지 않는 보조 기능)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # 큰 파일 커밋 방지 (5MB 이상)
+      - id: check-added-large-files
+        args: ["--maxkb=5000"]
+
+      # 병합 충돌 마커 감지
+      - id: check-merge-conflict
+
+# 전역 설정
+exclude: |
+  (?x)^(
+    \.venv/|
+    venv/|
+    build/|
+    dist/|
+    \.git/|
+    __pycache__/|
+    .*\.egg-info/
+  )
+
+# Pre-commit 설정 버전
+default_language_version:
+  python: python3.10
