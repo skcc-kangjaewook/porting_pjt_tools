@@ -7,10 +7,8 @@ select = [
     "D",  # pydocstyle
     "I",  # isort
     "B",  # bugbear
-    # "UP",  # pyupgrade
     "N",  # pep8-naming
-    "C90",  # bandit (security)
-    "S"
+    "S"   # security
 ]
 
 [tool.ruff.lint.flake8-bugbear]
@@ -27,5 +25,25 @@ extend-immutable-calls = [
 ]
 
 [tool.commitizen]
-name = "cz_conventional_commits"
+# name = "cz_conventional_commits"
+name = "cz_customize"
 version = "4.10.0"
+
+[tool.commitizen.customize]
+message_template = "{{type}}: {{message}}"
+
+questions = [
+  { name = "type", type = "list", message = "Select the type of change you are committing", choices = [
+      { value = "feat", name = "새로운 기능 추가" },
+      { value = "fix", name = "버그 수정" },
+      { value = "docs", name = "문서 변경" },
+      { value = "style", name = "코드 스타일 변경" },
+      { value = "refactor", name = "리팩토링" },
+      { value = "perf", name = "성능 개선" },
+      { value = "test", name = "테스트 추가/수정" },
+      { value = "build", name = "빌드/의존성 변경" },
+      { value = "ci", name = "CI/CD 변경" },
+      { value = "chore", name = "기타 변경 (예: .gitignore)" }
+  ]},
+  { name = "message", type = "input", message = "Commit message" }
+]
