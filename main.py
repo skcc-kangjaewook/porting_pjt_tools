@@ -10,9 +10,11 @@ load_dotenv()
 # `.env` 또는 환경변수에서 토큰을 읽습니다.
 github_token = os.getenv("GITHUB_TOKEN")
 if not github_token:
-    raise RuntimeError("환경변수 GITHUB_TOKEN이 설정되어 있지 않습니다. .env 파일 또는 환경변수에 토큰을 추가하세요.")
+    raise RuntimeError(
+        "환경변수 GITHUB_TOKEN이 설정되어 있지 않습니다. .env 파일 또는 환경변수에 토큰을 추가하세요.요오오오오오오"
+    )
 
-organization = "skccmygit"
+organization = "skax-internal"
 
 base_url = "https://api.github.com"
 
@@ -69,6 +71,7 @@ def create_secret(repo, secret_name, secret_value, public_key_id, public_key):
 def get_variables(repo):
     """리포지토리의 GitHub Actions 변수를 이름과 값 튜플 목록으로 반환합니다."""
     url = f"{base_url}/repos/{repo}/actions/variables"
+    # print(url)
     response = requests.get(url, headers=headers, timeout=10)
     if response.status_code == 200:
         variables = response.json().get("variables")
@@ -81,6 +84,7 @@ def get_variables(repo):
 def create_variable(repo, var_name, var_value):
     """리포지토리에 GitHub Actions 변수를 생성합니다."""
     url = f"{base_url}/repos/{repo}/actions/variables"
+    # print(url)
     payload = {"name": var_name, "value": var_value}
     response = requests.post(url, headers=headers, json=payload, timeout=10)
     if response.status_code == 201:
@@ -123,12 +127,12 @@ def get_repo_list(prefix=None):
 
 repos = [
     (
-        f"{organization}/abiz-gba-nc-backend",
-        f"{organization}/hynix-abiz-gba-nc-backend",
+        "skccmygit/abiz-gba-nc-backend",
+        "skax-internal/hynix-abiz-gba-nc-backend",
     ),
-    (f"{organization}/gba-ab-backend", f"{organization}/hynix-gba-ab-backend"),
-    (f"{organization}/gba-airp-backend", f"{organization}/hynix-gba-airp-backend"),
-    (f"{organization}/gba-ms", f"{organization}/hynix-gba-ms"),
+    ("skccmygit/gba-ab-backend", "skax-internal/hynix-gba-ab-backend"),
+    ("skccmygit/gba-airp-backend", "skax-internal/hynix-gba-airp-backend"),
+    ("skccmygit/gba-ms", "skax-internal/hynix-gba-ms"),
 ]
 
 
@@ -172,4 +176,4 @@ def migrate_secrets():
 
 if __name__ == "__main__":
     migrate_secrets()
-    migrate_variables()
+    # migrate_variables()
