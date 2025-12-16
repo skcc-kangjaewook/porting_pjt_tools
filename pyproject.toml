@@ -30,20 +30,24 @@ name = "cz_customize"
 version = "4.10.0"
 
 [tool.commitizen.customize]
-message_template = "{{type}}: {{message}}"
+message_template = "{{type}}({{scope}}): {{message}}"
 
 questions = [
   { name = "type", type = "list", message = "Select the type of change you are committing", choices = [
-      { value = "feat", name = "새로운 기능 추가" },
-      { value = "fix", name = "버그 수정" },
-      { value = "docs", name = "문서 변경" },
-      { value = "style", name = "코드 스타일 변경" },
-      { value = "refactor", name = "리팩토링" },
-      { value = "perf", name = "성능 개선" },
-      { value = "test", name = "테스트 추가/수정" },
-      { value = "build", name = "빌드/의존성 변경" },
-      { value = "ci", name = "CI/CD 변경" },
-      { value = "chore", name = "기타 변경 (예: .gitignore)" }
+      { value = "feat", name = "[feat] 새로운 기능 추가" },
+      { value = "fix", name = "[fix] 버그 수정" },
+      { value = "docs", name = "[docs] 문서 변경" },
+      { value = "style", name = "[style] 코드 스타일 변경" },
+      { value = "refactor", name = "[refactor] 리팩토링" },
+      { value = "perf", name = "[perf] 성능 개선" },
+      { value = "test", name = "[test] 테스트 추가/수정" },
+      { value = "build", name = "[build] 빌드/의존성 변경" },
+      { value = "ci", name = "[ci] CI/CD 변경" },
+      { value = "chore", name = "[chore] 기타 변경 (예: .gitignore)" }
   ]},
-  { name = "message", type = "input", message = "Commit message" }
+  { name = "scope", type = "input", message = "이 변경의 범위는 무엇입니까? (클래스 또는 파일 이름)" },
+  { name = "message", type = "input", message = "코드 변경 사항에 대한 짧고 명령형 요약을 작성하세요" },
+  { name = "body", type = "input", message = "코드 변경 사항에 대한 추가적인 맥락 정보를 제공하세요 (optional)" },
+  { name = "breaking", type = "confirm", message = "이것이 호환성을 깨뜨리는 변경(BREAKING CHANGE)입니까?" },
+  { name = "footer", type = "input", message = "Footer (e.g. issues, references)" }
 ]
