@@ -13,3 +13,4 @@ wheels/
 .github/copilot-instructions.md
 uv.lock
 repos.txt
+main.py
