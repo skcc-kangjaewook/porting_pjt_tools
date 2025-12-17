@@ -12,3 +12,4 @@ wheels/
 .env
 .github/copilot-instructions.md
 uv.lock
+repos.txt
