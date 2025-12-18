@@ -22,6 +22,56 @@ headers = {
 }
 
 
+def list_branches(repo_owner, repo_name):
+    """GitHub API를 이용해 특정 리포지토리의 브랜치 목록을 조회합니다.
+
+    Args:
+        repo_owner: 저장소 소유자 (예: 'octocat')
+        repo_name: 저장소 이름 (예: 'Hello-World')
+        token: GitHub Personal Access Token
+
+    Returns:
+        브랜치 이름 리스트
+
+    """
+    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/branches"
+    response = requests.get(url, headers=headers, timeout=10)
+    if response.status_code != 200:
+        raise Exception(f"Failed to get branches: {response.json()}")
+
+    branches = [branch["name"] for branch in response.json()]
+    return branches
+
+
+def create_branch(repo_owner, repo_name, new_branch, base_branch):
+    """GitHub API를 이용해 새로운 브랜치를 생성합니다.
+
+    :param repo_owner: 저장소 소유자 (예: 'octocat')
+    :param repo_name: 저장소 이름 (예: 'Hello-World')
+    :param new_branch: 새로 만들 브랜치 이름 (예: 'feature-xyz')
+    :param base_branch: 기준이 되는 브랜치 이름 (예: 'main')
+    :param token: GitHub Personal Access Token
+
+    """
+    # 1. 기준 브랜치의 최신 커밋 SHA 가져오기
+    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/git/ref/heads/{base_branch}"
+    response = requests.get(url, headers=headers, timeout=10)
+    if response.status_code != 200:
+        raise Exception(f"Failed to get base branch: {response.json()}")
+    sha = response.json()["object"]["sha"]
+
+    # 2. 새 브랜치 생성
+    create_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/git/refs"
+    data = {"ref": f"refs/heads/{new_branch}", "sha": sha}
+    create_response = requests.post(create_url, headers=headers, json=data, timeout=10)
+    if create_response.status_code != 201:
+        # raise Exception(f"[{repo_name}] Failed to create branch: {create_response.json()}")
+        print(f"[{repo_name}] Failed to create branch: {create_response.json()}")
+
+    print(f"✅ Branch '{new_branch}' created from '{base_branch}'")
+    return create_response.json()
+
+
 def get_secrets(repo):
     """리포지토리의 GitHub Actions 시크릿 이름 목록을 반환합니다."""
     url = f"{base_url}/repos/{repo}/actions/secrets"
