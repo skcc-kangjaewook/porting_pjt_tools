@@ -1,8 +1,11 @@
 import base64
 import os
+import tempfile
+from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
+from git import Repo
 from nacl import encoding, public
 
 load_dotenv()
@@ -68,7 +71,7 @@ def create_branch(repo_owner, repo_name, new_branch, base_branch):
         # raise Exception(f"[{repo_name}] Failed to create branch: {create_response.json()}")
         print(f"[{repo_name}] Failed to create branch: {create_response.json()}")
 
-    print(f"✅ Branch '{new_branch}' created from '{base_branch}'")
+    print(f"Branch '{new_branch}' created from '{base_branch}'")
     return create_response.json()
 
 
@@ -250,7 +253,7 @@ def migrate_variables(repos):
             # print(var_name, var_value)
 
 
-def migrate_secrets(repos):
+def migrate_secrets(repos, secret_value):
     """시크릿 마이그레이션 메인 함수."""
     for repo in repos:
         source_repo = repo[0]
@@ -265,9 +268,83 @@ def migrate_secrets(repos):
             # print(f"public_key_id: {public_key_id}, public_key: {public_key}")
 
             if public_key and public_key_id:
-                secret_value = "temp_value"  # noqa
                 # print(encrypt_value(public_key, secret_value))
 
                 secrets = get_secrets(source_repo)
                 for secret_name in secrets:
                     create_secret(target_repo, secret_name, secret_value, public_key_id, public_key)
+
+
+def apply_source_branch_to_target(
+    source_repo_owner,
+    source_repo_name,
+    target_repo_owner,
+    target_repo_name,
+    source_branch="develop-adot-model-test",
+    target_branch=None,
+):
+    """GitPython을 사용하여 소스 리포지토리의 특정 브랜치를 타겟 리포지토리에 적용합니다.
+
+    Args:
+        source_repo_owner: 소스 리포지토리 소유자 (예: 'octocat')
+        source_repo_name: 소스 리포지토리 이름 (예: 'Hello-World')
+        target_repo_owner: 타겟 리포지토리 소유자
+        target_repo_name: 타겟 리포지토리 이름
+        source_branch: 소스 브랜치 이름 (기본값: 'develop-adot-model-test')
+        target_branch: 타겟 브랜치 이름 (기본값: source_branch와 동일)
+
+    Returns:
+        성공 여부 (True/False)
+
+    """
+    if target_branch is None:
+        target_branch = source_branch
+
+    # GitHub 토큰을 포함한 인증 URL 생성
+    source_url = f"https://{github_token}@github.com/{source_repo_owner}/{source_repo_name}.git"
+    target_url = f"https://{github_token}@github.com/{target_repo_owner}/{target_repo_name}.git"
+
+    # 임시 디렉토리 생성
+    with tempfile.TemporaryDirectory() as temp_dir:
+        try:
+            print(f"Cloning source repository: {source_repo_owner}/{source_repo_name}")
+
+            # 소스 리포지토리 클론 (전체 히스토리 포함)
+            source_repo_path = Path(temp_dir) / "source"
+            source_repo = Repo.clone_from(
+                source_url,
+                source_repo_path,
+                branch=source_branch,
+                # depth=1 제거 - 전체 히스토리 필요
+            )
+
+            print(f"Source branch '{source_branch}' cloned successfully")
+
+            # 타겟 리포지토리를 remote로 추가
+            print(f"Adding target repository as remote: {target_repo_owner}/{target_repo_name}")
+            target_remote = source_repo.create_remote("target", target_url)
+
+            # 타겟 리포지토리의 기존 브랜치 확인
+            try:
+                target_remote.fetch()
+                remote_branches = [ref.name for ref in target_remote.refs]
+                branch_exists = f"target/{target_branch}" in remote_branches
+            except Exception:
+                branch_exists = False
+
+            # 타겟 브랜치로 push
+            print(f"Pushing '{source_branch}' to target repository as '{target_branch}'")
+
+            if branch_exists:
+                print(f"Branch '{target_branch}' already exists in target, force pushing...")
+                source_repo.git.push("target", f"{source_branch}:{target_branch}", force=True)
+                print(f"Branch '{target_branch}' updated in {target_repo_owner}/{target_repo_name}")
+            else:
+                source_repo.git.push("target", f"{source_branch}:{target_branch}")
+                print(f"Branch '{target_branch}' created in {target_repo_owner}/{target_repo_name}")
+
+            return True
+
+        except Exception as e:
+            print(f"Error applying branch: {e}")
+            return False
